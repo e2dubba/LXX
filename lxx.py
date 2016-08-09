@@ -58,7 +58,7 @@ def beta2_strong_list(list_of_beta_words):
         try:
             strong = get_strongs(word).lstrip('0')
         except IndexError:
-            strong = None
+            strong = ''
             write_error('No Strong Number for Compound Word')
         comp_strong.append(strong)
     return comp_strong 
@@ -112,7 +112,6 @@ def norm_compounds(row):
         try:
             lemmata = get_strongs((lemma[0] ,))
         except IndexError:
-            print(lemma)
             if lemma[0] == '*':
                 write_error('No corresponding Strongs Number', str(lemma))
             lemmata = ''
@@ -135,10 +134,11 @@ def norm_compounds(row):
         except IndexError:
             write_error('Compound Strongs Not Found', str(lemma))
             lexical = ''
-            lemmata = ''
+            lemmata = ' '
         if not lexical:
             try:
                 lexical = ','.join(greek.decode(word) for word in lemma)
+                print(lexical)
             except IndexError:
                 write_error('No Lexical Entry')
         
@@ -184,7 +184,7 @@ for row in open(document):
         try:
             lemma, lexical = norm_compounds(row)
             if lemma == '':
-                lemma = None
+                lemma = ''
                 word_ele.attrib['lemma'] = 'Strong:' + lexical 
             else:
                 word_ele.attrib['lemma'] = 'Strong:' + lexical + \
@@ -210,7 +210,6 @@ for row in open(document):
             book = ref[0]
             chap_verse = ref[1].strip('\n').split(':')
             chapter = book + '.' + chap_verse[0]
-            # How do you make a milestone? see footnote
             try: 
                 if chapter == chap_ele.attrib['osisID']:
                     verse_ele = verse_assign(chap_ele, verse)
