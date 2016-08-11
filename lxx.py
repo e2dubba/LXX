@@ -58,10 +58,22 @@ def beta2_strong_list(list_of_beta_words):
         try:
             strong = get_strongs(word).lstrip('0')
         except IndexError:
+            print('\n' + verse + '\n' + ','.join(list_of_beta_words))
+            from xtermcolor import colorize 
+            print(colorize("IndexError!!!", ansi=1))
             strong = ''
             write_error('No Strong Number for Compound Word')
         comp_strong.append(strong)
     return comp_strong 
+
+
+def dual_root(lemma):
+    '''
+    '''
+    comp_strong = []
+    for word in lemma:
+        word = (word ,)
+        try:
 
         
 def get_comp_uni(value):
@@ -127,20 +139,26 @@ def norm_compounds(row):
         problem, most of these words will be in the db. 
         '''
         lemma.append(lemma.pop(0))
+        lemma, lexical = dual_root(lemma)
         comp_strong = beta2_strong_list(lemma)
-        try:
-            lemmata = multi_word(comp_strong)
-            lexical = get_comp_uni(lemmata)
-        except IndexError:
-            write_error('Compound Strongs Not Found', str(lemma))
-            lexical = ''
-            lemmata = ' '
-        if not lexical:
+        print(comp_strong)
+        if not comp_strong:
+            lemmata = ','.join(greek.decode(word) for word in lemma)
+            from xtermcolor import colorize
+            print(colorize(lemmata, ansi=3))
+        else:
             try:
-                lexical = ','.join(greek.decode(word) for word in lemma)
-                print(lexical)
+                lemmata = multi_word(comp_strong)
+                lexical = get_comp_uni(lemmata)
             except IndexError:
-                write_error('No Lexical Entry')
+                write_error('Compound Strongs Not Found', str(lemma))
+                lexical = ','.join(greek.decode(word) for word in lemma)
+                lemmata = ' '
+            if not lexical:
+                try:
+                    lexical = ','.join(greek.decode(word) for word in lemma)
+                except IndexError:
+                    write_error('No Lexical Entry')
         
     elif len(lemma) == 3:
         lemma.append(lemma.pop(0))
