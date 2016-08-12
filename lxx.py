@@ -6,6 +6,8 @@ import lxml.etree as et
 from xml.dom import minidom
 import sqlite3
 
+from xtermcolor import colorize
+
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('document', nargs='*')
@@ -58,24 +60,14 @@ def beta2_strong_list(list_of_beta_words):
         try:
             strong = get_strongs(word).lstrip('0')
         except IndexError:
-            print('\n' + verse + '\n' + ','.join(list_of_beta_words))
-            from xtermcolor import colorize 
-            print(colorize("IndexError!!!", ansi=1))
-            strong = ''
-            write_error('No Strong Number for Compound Word')
+            comp_strong = []
+            print('No Strong Number for Compound Word' + str(list_of_beta_words
+                ))
+            return comp_strong
         comp_strong.append(strong)
     return comp_strong 
 
 
-def dual_root(lemma):
-    '''
-    '''
-    comp_strong = []
-    for word in lemma:
-        word = (word ,)
-        try:
-
-        
 def get_comp_uni(value):
     value = (value ,)
     c.execute('SELECT greek FROM new_strong_combined WHERE strongs = ?',
@@ -125,70 +117,68 @@ def norm_compounds(row):
             lemmata = get_strongs((lemma[0] ,))
         except IndexError:
             if lemma[0] == '*':
-                write_error('No corresponding Strongs Number', str(lemma))
+                print('No corresponding Strongs Number', str(lemma))
             lemmata = ''
         try:
             lexical = greek.decode(lemma[0])
         except IndexError:
             wrte_error('Betacode decode error')
             lexical = ''
-
+        
     elif len(lemma) == 2:
         '''
         This is for the words that have two lexemes. This shouldn't be a
         problem, most of these words will be in the db. 
         '''
         lemma.append(lemma.pop(0))
-        lemma, lexical = dual_root(lemma)
+        #lemma, lexical = dual_root(lemma)
         comp_strong = beta2_strong_list(lemma)
-        print(comp_strong)
         if not comp_strong:
-            lemmata = ','.join(greek.decode(word) for word in lemma)
-            from xtermcolor import colorize
-            print(colorize(lemmata, ansi=3))
+            lexical = ','.join(greek.decode(word) for word in lemma)
+            lemmata = ''
         else:
             try:
                 lemmata = multi_word(comp_strong)
                 lexical = get_comp_uni(lemmata)
             except IndexError:
-                write_error('Compound Strongs Not Found', str(lemma))
+                print('Compound Strongs Not Found', str(lemma))
                 lexical = ','.join(greek.decode(word) for word in lemma)
-                lemmata = ' '
+                lemmata = ''
             if not lexical:
                 try:
                     lexical = ','.join(greek.decode(word) for word in lemma)
                 except IndexError:
-                    write_error('No Lexical Entry')
+                    print('No Lexical Entry')
         
     elif len(lemma) == 3:
+        print(row)
         lemma.append(lemma.pop(0))
         lemmar = beta2_strong_list(lemma[-2:])
         ini_lemmata = multi_word(lemmar).lstrip('0')
         try:
             lemmata = [get_strongs((lemma[0] ,)), ini_lemmata]
         except IndexError:
-            write_error('No Stongs number for Root')
+            print('No Stongs number for Root')
             lemmata = ''
         try:
             lemmata = multi_word(lemmata)
         except IndexError:
-            write_error('multi_word() Index Error')
+            print('multi_word() Index Error')
+            lemmata = ''
         try:
             lexical = get_comp_uni(lemmata) 
-        except sqlite3.InterfaceError:
-            write_error('sqlite3 Interface Error')
-            lexical = ''
+        except (sqlite3.InterfaceError, IndexError):
+            print('sqlite3 Interface Error or IndexError')
+            lexical = ','.join(greek.decode(word) for word in lemma)
+            lemmata = ''
         if not lexical:
-            try:
-                lexical = ','.join(greek.decode(word) for word in lemma)
-            except IndexError:
-                write_error('No Lexical Entry')
+            lexical = ','.join(greek.decode(word) for word in lemma)
 
     elif len(lemma) == 0:
         '''
         Write to error file
         '''
-        write_error('No Lexical Given in CATSS')
+        print('No Lexical Given in CATSS')
         lemmata = None
         lexical = None
     return lemmata, lexical  
@@ -199,18 +189,13 @@ for row in open(document):
     element = gen 
     if len(row) >= 20:
         word_ele = et.SubElement(chap_ele, 'w')
-        try:
-            lemma, lexical = norm_compounds(row)
-            if lemma == '':
-                lemma = ''
-                word_ele.attrib['lemma'] = 'Strong:' + lexical 
-            else:
-                word_ele.attrib['lemma'] = 'Strong:' + lexical + \
-                       ' lemma.strong:G' + lemma  
-            # word_ele.attrib['lexical'] = lexical
-        except TypeError:
-            continue
-            # write_error('TypeError Raised from `norm_compounds()`')
+        lemmata, lexical = norm_compounds(row)
+        if lemmata == '':
+            word_ele.attrib['lemma'] = 'Strong:' + lexical 
+        else:
+            word_ele.attrib['lemma'] = 'Strong:' + lexical + \
+                   ' lemma.strong:G' + lemmata
+            
         word_ele.attrib['morph'] = 'packard:' + row[24:35].strip()
         word_ele.attrib['wn'] = '%0.3d' % word_num
         word_ele.text = greek.decode(row[:24].strip())
