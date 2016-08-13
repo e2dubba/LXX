@@ -5,6 +5,9 @@ from betacode import greek
 import lxml.etree as et
 from xml.dom import minidom
 import sqlite3
+import os 
+import subprocess as sp 
+import webbrowser 
 
 from xtermcolor import colorize
 
@@ -84,6 +87,34 @@ def multi_word(list_of_num):
         word = get_compound(second_try)
     return word[0][0]
 
+
+def pcruncher(row, verse, lemma):
+    lemma = lemma.lower()
+    poss_roots = sp.run(['cruncher'], input=lemma, stdout=sp.PIPE, + \
+            universal_newlines=True, env=os.environ).stdout 
+    poss_roots = pss_roots.replace('<NL>', '').replace('<NL>', '\n').split('\n')
+    try:
+        del poss_roots[0]
+        del poss_roots[-2:]
+    except IndexError:
+        # This IndexError will hapen when perseus returns no values, so it need
+        # s to find that info somewhere, should have it look up something on
+        # the perseus website.
+        url =
+        'http://www.perseus.tufts.edu/hopper/morph?l=' + lemma + '&la=greek'
+        webbrowser.open_new(url) 
+        lexical = input("What is the Lexical form of {lemma}?\n" )
+        # write that lemma = lexical in a db somewhere 
+        return lexical 
+        
+        
+    roots_set = set(greek.decode(root.split()[1]).upper() for root in poss_roots)  
+    if roots_set == 1:
+        lexical = roots_set.pop()
+    else:
+
+    
+    
 
 def write_error(error_type, lemma):
     c.execute('SELECT * FROM extra_word WHERE beta = ?', 
@@ -190,12 +221,11 @@ for row in open(document):
     if len(row) >= 20:
         word_ele = et.SubElement(chap_ele, 'w')
         lemmata, lexical = norm_compounds(row)
-        if lemmata == '':
+        if not lemmata: 
             word_ele.attrib['lemma'] = 'Strong:' + lexical 
         else:
             word_ele.attrib['lemma'] = 'Strong:' + lexical + \
                    ' lemma.strong:G' + lemmata
-            
         word_ele.attrib['morph'] = 'packard:' + row[24:35].strip()
         word_ele.attrib['wn'] = '%0.3d' % word_num
         word_ele.text = greek.decode(row[:24].strip())
