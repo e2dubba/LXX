@@ -8,6 +8,7 @@ import sqlite3
 import os 
 import subprocess as sp 
 import webbrowser 
+import betacode
 
 from xtermcolor import colorize
 
@@ -64,7 +65,7 @@ def beta2_strong_list(list_of_beta_words):
             strong = get_strongs(word).lstrip('0')
         except IndexError:
             comp_strong = []
-            print('No Strong Number for Compound Word' + str(list_of_beta_words
+            print('No Strong Number for Compound Word ' + str(list_of_beta_words
                 ))
             return comp_strong
         comp_strong.append(strong)
@@ -88,11 +89,12 @@ def multi_word(list_of_num):
     return word[0][0]
 
 
-def pcruncher(row, verse, lemma):
-    lemma = lemma.lower()
-    poss_roots = sp.run(['cruncher'], input=lemma, stdout=sp.PIPE, + \
+def pcruncher(row, verse):
+    inf_form = row[:24].strip()
+    lemma = inf_form.lower()
+    poss_roots = sp.run(['cruncher'], input=lemma, stdout=sp.PIPE,
             universal_newlines=True, env=os.environ).stdout 
-    poss_roots = pss_roots.replace('<NL>', '').replace('<NL>', '\n').split('\n')
+    poss_roots = poss_roots.replace('<NL>', '').replace('</NL>', '\n').split('\n')
     try:
         del poss_roots[0]
         del poss_roots[-2:]
@@ -100,19 +102,46 @@ def pcruncher(row, verse, lemma):
         # This IndexError will hapen when perseus returns no values, so it need
         # s to find that info somewhere, should have it look up something on
         # the perseus website.
-        url =
-        'http://www.perseus.tufts.edu/hopper/morph?l=' + lemma + '&la=greek'
-        webbrowser.open_new(url) 
-        lexical = input("What is the Lexical form of {lemma}?\n" )
+        lexical = ff_parser(lemma)
         # write that lemma = lexical in a db somewhere 
         return lexical 
         
-        
-    roots_set = set(greek.decode(root.split()[1]).upper() for root in poss_roots)  
-    if roots_set == 1:
-        lexical = roots_set.pop()
-    else:
+    try:
+        roots_set = set(greek.decode(root.split()[1].upper()) for root in poss_roots)  
+    except betacode.greek.BetacodeError:
+        print(colorize("User Input!\n", ansi=3) + \
+                greek.decode(row[:24]) + row[24:36] + greek.decode(row[36:])+ \
+                "Possible Roots " + str(poss_roots))
+        print("What is the correct root for this misparsed " +  \
+                "items?")
+        lexical = ff_parser(lemma)
+        return lexical 
 
+    if len(roots_set) == 1:
+        lexical = roots_set.pop()
+        return lexical
+    else:
+        menu = {str(k): v for k, v in enumerate(roots_set)}
+        print(colorize("User Input!\n", ansi=3) + \
+                greek.decode(row[:24]) + row[24:36] + greek.decode(row[36:]))
+        for key, value in menu.items():
+            print(key, ':', value)
+        print(str(len(menu)), ':', 'Other')
+        usr_ans = input("Which is the lexical form of %s?\n" % lemma)
+        if usr_ans == str(len(menu)):
+            lexical = ff_parser(lemma)
+            return lexical
+        else:
+            lexical = menu[usr_ans]
+            return lexical 
+
+
+def ff_parser(lemma):
+    url ='http://www.perseus.tufts.edu/hopper/morph?l=' + lemma + \
+    '&la=greek'
+    webbrowser.open_new(url) 
+    lexical = input("What is the Lexical form of %s?\n" % lemma )
+    return lexical
     
     
 
@@ -154,7 +183,7 @@ def norm_compounds(row):
             lexical = greek.decode(lemma[0])
         except IndexError:
             wrte_error('Betacode decode error')
-            lexical = ''
+            lexical = pcruncher(row, verse) 
         
     elif len(lemma) == 2:
         '''
@@ -165,19 +194,22 @@ def norm_compounds(row):
         #lemma, lexical = dual_root(lemma)
         comp_strong = beta2_strong_list(lemma)
         if not comp_strong:
-            lexical = ','.join(greek.decode(word) for word in lemma)
+            #lexical = ','.join(greek.decode(word) for word in lemma)
+            lexical = pcruncher(row, verse) 
             lemmata = ''
         else:
             try:
                 lemmata = multi_word(comp_strong)
                 lexical = get_comp_uni(lemmata)
             except IndexError:
-                print('Compound Strongs Not Found', str(lemma))
-                lexical = ','.join(greek.decode(word) for word in lemma)
+                #print('Compound Strongs Not Found ', str(lemma))
+                # lexical = ','.join(greek.decode(word) for word in lemma)
+                lexical = pcruncher(row, verse)
                 lemmata = ''
             if not lexical:
                 try:
-                    lexical = ','.join(greek.decode(word) for word in lemma)
+                    #lexical = ','.join(greek.decode(word) for word in lemma)
+                    lexical = pcruncher(row, verse)
                 except IndexError:
                     print('No Lexical Entry')
         
@@ -200,7 +232,8 @@ def norm_compounds(row):
             lexical = get_comp_uni(lemmata) 
         except (sqlite3.InterfaceError, IndexError):
             print('sqlite3 Interface Error or IndexError')
-            lexical = ','.join(greek.decode(word) for word in lemma)
+            #lexical = ','.join(greek.decode(word) for word in lemma)
+            lexical = pcruncher(row, verse)
             lemmata = ''
         if not lexical:
             lexical = ','.join(greek.decode(word) for word in lemma)
