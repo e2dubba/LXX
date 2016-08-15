@@ -8,6 +8,7 @@ import sqlite3
 import os 
 import subprocess as sp 
 import webbrowser 
+import requests, bs4
 import betacode
 
 from xtermcolor import colorize
@@ -90,6 +91,10 @@ def multi_word(list_of_num):
 
 
 def pcruncher(row, verse):
+    '''
+    Uses perseus's cruncher which can be installed from the website, but if
+    there are any errors to what the cruncher produces it calls the perseus website. 
+    '''
     inf_form = row[:24].strip()
     lemma = inf_form.lower()
     poss_roots = sp.run(['cruncher'], input=lemma, stdout=sp.PIPE,
@@ -105,19 +110,43 @@ def pcruncher(row, verse):
         lexical = ff_parser(lemma)
         # write that lemma = lexical in a db somewhere 
         return lexical 
-        
     try:
-        roots_set = set(greek.decode(root.split()[1].upper()) for root in poss_roots)  
+        roots_set = set(greek.decode(root.split()[1].upper().replace('-', '')) for root in poss_roots)  
     except betacode.greek.BetacodeError:
-        print(colorize("User Input!\n", ansi=3) + \
+        # This betacode error is often from one value with a comma in it. 
+        roots_set = set(root.split()[1].upper() for root in poss_roots)
+        try:
+            roots_list = [ word.split(',')[1] for word in roots_set]
+        except IndexError:
+            roots_list = []
+            for root in roots_set:
+                try:
+                    roots_list.append(greek.decode(root))
+                except betacode.greek.BetacodeError:
+                    # some time thes there is an IndexError in handeling this
+                    # exception I probably should send it to ff_parser
+                    roots_list.append(greek.decode(root.split(',')[1]))
+            roots_set = set(roots_list)
+        print(colorize("\nUser Input!\n", ansi=3) + \
                 greek.decode(row[:24]) + row[24:36] + greek.decode(row[36:])+ \
-                "Possible Roots " + str(poss_roots))
-        print("What is the correct root for this misparsed " +  \
-                "items?")
+                "Possible Roots " + str(roots_list))
+        if len(roots_list) == 1:
+            try:
+                lexical = roots_list.pop()
+                var = input("Is this the correct word: %s? (y/n)" % lexical)
+                if var == 'y':
+                    return lexical
+                if var == 'n':
+                    lexical = ff_parser(lemma)
+                return lexical 
+            except betacode.greek.BetacodeError:
+                print("What is the correct root for this misparsed item?")
+                lexical = ff_parser(lemma)
+                return lexical  
+    if len(roots_set) == 0:
         lexical = ff_parser(lemma)
-        return lexical 
-
-    if len(roots_set) == 1:
+        return lexical
+    elif len(roots_set) == 1:
         lexical = roots_set.pop()
         return lexical
     else:
@@ -132,17 +161,36 @@ def pcruncher(row, verse):
             lexical = ff_parser(lemma)
             return lexical
         else:
-            lexical = menu[usr_ans]
+            lexical = menu[str(usr_ans)]
             return lexical 
 
 
 def ff_parser(lemma):
     url ='http://www.perseus.tufts.edu/hopper/morph?l=' + lemma + \
     '&la=greek'
-    webbrowser.open_new(url) 
-    lexical = input("What is the Lexical form of %s?\n" % lemma )
-    return lexical
-    
+    res = requests.get(url)
+    res.raise_for_status()
+    soup = bs4.BeautifulSoup(res.text, "lxml")
+    elems = soup.select('div > h4')
+    web_words = {str(x): y.get_text().replace('-', '') for x, y in enumerate(elems)}
+    if len(web_words) == 1:
+        lexical = web_words[str(0)]
+        return lexical 
+    elif len(web_words) == 0:
+        lexical = input("\nThe Computer failed.\n \
+                Please enter the lexical form of %s." % lemma)
+        try:
+            lexical = greek.decode(lexical)
+        except betacode.greek.BetacodeError:
+            pass
+        return lexical 
+    else:
+        webbrowser.open(url) 
+        for key, value in web_words.items():
+            print(key, ':', value)
+        var = input("What is the Lexical form of %s?\n" % lemma )
+        lexical = web_words[str(var)]
+        return lexical
     
 
 def write_error(error_type, lemma):
