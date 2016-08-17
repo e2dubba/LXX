@@ -14,6 +14,12 @@ if __name__ = "__main__":
     reducing the number of ambiguous forms. For those compounds that only have 
     ambiguous forms a phrase book needs to be established so that User interaction
     need only occur once, or after given, can be queried to answer other ambiguities. 
+
+    Database construction:
+    1) inflect forms, packard parsing, roots (one to many; for this one the primary key is going to be the combination of parsing and roots)
+    2) inflect forms, lexical forms (many to many)
+    3) Packard Parsing, cruncher parsing (many to many)
+    4) lexical forms, cruncher parsing (many to many)
     '''
     import argparse
     parser = argparse.ArgumentParser()
@@ -21,7 +27,7 @@ if __name__ = "__main__":
     args = parser.parse_args()
     key = args.passage 
     for doc in keys:
-        opr en(doc)
+        open(doc)
         for row in doc:
             if len(row[36:].split()) >= 1:
                 
