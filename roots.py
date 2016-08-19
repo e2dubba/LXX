@@ -4,14 +4,16 @@ import sqlite3
 import os 
 
 
-conn = sqlite3.connect('./strongs.db')
+conn = sqlite3.connect('strongs.db')
 c = conn.cursor()
 
-c.execute('CREATE TABLE row_value (
-		inflected_form text not null,
-		morphology text not null,
-		etymology text not null,
-		primary key (morphology, etymology) )')
+def create_row_table():
+	c.execute('CREATE TABLE IF NOT EXISTS row_value (
+			inflected_form TEXT NOT NULL,
+			morphology TEXT NOT NULL,
+			etymology TEXT NOT NULL,
+			PRIMARY KEY (morphology, etymology) )')
+
 
 def update_db(row):
 	infl = row[:24].strip()
@@ -19,6 +21,8 @@ def update_db(row):
 	etym_roots = row[36:].strip()
 	c.execute('INSERT INTO row_value VALUES (?, ?, ?)',
 			(infl, morph, etym_roots))
+	conn.commit()
+	
 
 
 
