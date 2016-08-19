@@ -4,7 +4,7 @@ import sqlite3
 import os 
 
 
-conn = sqlite3.connect('./strongs.db')
+conn = sqlite3.connect('strongs.db')
 c = conn.cursor()
 
 c.execute('CREATE TABLE row_value (
