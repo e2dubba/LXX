@@ -24,6 +24,28 @@ def update_db(row):
 	conn.commit()
 	
 
+def read_cruncher():
+	c.execute('SELECT inflected_form FROM row_values')
+	parse_set = set(tup for tup in c.fetchall())
+	num_forms = len(parse_set)
+	num = 1
+	for form in parse_set:
+		form = form.lower()
+		print("Forms to be parsed:", num, 'of', num_forms)
+		poss_roots = sp.run(['cruncher'], input=form, stdout=sp.PIPE,
+				universal_newlines=True, env=os.environ).stdout
+		poss_roots = poss_roots.replace('<NL>', '').replace('</NL>',
+				'\n').split('\n')
+		try:
+			del poss_roots[0]
+			del poss_roots[-2]
+		except IndexError:
+			error_doc.write(greek.decode(form))
+		
+
+
+	
+
 
 
 
