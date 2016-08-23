@@ -7,13 +7,6 @@ import os
 conn = sqlite3.connect('strongs.db')
 c = conn.cursor()
 
-<<<<<<< HEAD
-c.execute('CREATE TABLE row_value (
-		inflected_form TEXT NOT NULL,
-		morphology TEXT NOT NULL,
-		etymology TEXT NOT NULL,
-		PRIMARY KEY (morphology, etymology) )')
-=======
 def create_row_table():
 	c.execute('CREATE TABLE IF NOT EXISTS row_value (
 			inflected_form TEXT NOT NULL,
@@ -21,7 +14,6 @@ def create_row_table():
 			etymology TEXT NOT NULL,
 			PRIMARY KEY (morphology, etymology) )')
 
->>>>>>> bb82e5ebb983d7e9453b9d45b80a8ad66b43440c
 
 def update_db(row):
 	infl = row[:24].strip()
@@ -49,13 +41,7 @@ def read_cruncher():
 			del poss_roots[-2]
 		except IndexError:
 			error_doc.write(greek.decode(form))
-		
-
-
-	
-
-
-
+                
 
 
 if __name__ = "__main__":
