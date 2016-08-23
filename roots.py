@@ -7,11 +7,21 @@ import os
 conn = sqlite3.connect('strongs.db')
 c = conn.cursor()
 
+<<<<<<< HEAD
 c.execute('CREATE TABLE row_value (
 		inflected_form TEXT NOT NULL,
 		morphology TEXT NOT NULL,
 		etymology TEXT NOT NULL,
 		PRIMARY KEY (morphology, etymology) )')
+=======
+def create_row_table():
+	c.execute('CREATE TABLE IF NOT EXISTS row_value (
+			inflected_form TEXT NOT NULL,
+			morphology TEXT NOT NULL,
+			etymology TEXT NOT NULL,
+			PRIMARY KEY (morphology, etymology) )')
+
+>>>>>>> bb82e5ebb983d7e9453b9d45b80a8ad66b43440c
 
 def update_db(row):
 	infl = row[:24].strip()
@@ -19,6 +29,30 @@ def update_db(row):
 	etym_roots = row[36:].strip()
 	c.execute('INSERT INTO row_value VALUES (?, ?, ?)',
 			(infl, morph, etym_roots))
+	conn.commit()
+	
+
+def read_cruncher():
+	c.execute('SELECT inflected_form FROM row_values')
+	parse_set = set(tup for tup in c.fetchall())
+	num_forms = len(parse_set)
+	num = 1
+	for form in parse_set:
+		form = form.lower()
+		print("Forms to be parsed:", num, 'of', num_forms)
+		poss_roots = sp.run(['cruncher'], input=form, stdout=sp.PIPE,
+				universal_newlines=True, env=os.environ).stdout
+		poss_roots = poss_roots.replace('<NL>', '').replace('</NL>',
+				'\n').split('\n')
+		try:
+			del poss_roots[0]
+			del poss_roots[-2]
+		except IndexError:
+			error_doc.write(greek.decode(form))
+		
+
+
+	
 
 
 

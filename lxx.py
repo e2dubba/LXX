@@ -123,7 +123,7 @@ def pcruncher(row, verse):
                 try:
                     roots_list.append(greek.decode(root))
                 except betacode.greek.BetacodeError:
-                    # some time thes there is an IndexError in handeling this
+                    # some timess there is an IndexError in handeling this
                     # exception I probably should send it to ff_parser
                     roots_list.append(greek.decode(root.split(',')[1]))
             roots_set = set(roots_list)
