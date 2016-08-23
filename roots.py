@@ -8,10 +8,10 @@ conn = sqlite3.connect('strongs.db')
 c = conn.cursor()
 
 c.execute('CREATE TABLE row_value (
-		inflected_form text not null,
-		morphology text not null,
-		etymology text not null,
-		primary key (morphology, etymology) )')
+		inflected_form TEXT NOT NULL,
+		morphology TEXT NOT NULL,
+		etymology TEXT NOT NULL,
+		PRIMARY KEY (morphology, etymology) )')
 
 def update_db(row):
 	infl = row[:24].strip()
