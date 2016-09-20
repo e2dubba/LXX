@@ -335,10 +335,7 @@ for row in open(document):
                 chap_ele = et.SubElement(element, 'chapter')
                 chap_ele.attrib['osisID'] = chapter
                 verse_ele = verse_assign(chap_ele, verse)
-'''
-            verse_ele = et.SubElement(chap_ele, 'verse')
-            verse_ele.attrib['osisID'] = verse
-'''
+
 
 tree = et.ElementTree(element)
 tree.write('%s.xml' % document, encoding='unicode', pretty_print=True)
