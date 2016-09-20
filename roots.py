@@ -7,6 +7,7 @@ import os
 conn = sqlite3.connect('strongs.db')
 c = conn.cursor()
 
+
 def create_row_table():
 	c.execute('CREATE TABLE IF NOT EXISTS row_value ' 
 			'(inflected_form TEXT NOT NULL, '
@@ -27,6 +28,13 @@ def create_lexical():
             'lexical TEXT NOT NULL)')
 
 
+def create_roots_table():
+    c.execute('CREATE TABLE IF NOT EXISTS roots_table '
+            '(lexical TEX NOT NULL, '
+            'perseus TEXT NOT NULL, ' 
+            'form TEXT NOT NULL)')
+
+
 def update_db(row):
 	infl = row[:24].strip()
 	morph = row[24:36].strip()
@@ -36,7 +44,6 @@ def update_db(row):
 	conn.commit()
 	
 
-<<<<<<< HEAD
 def parse_phrase_book(form, perseus):
     c.execute('SELECT morphology WHERE inflected_form = ?',
             (form))
@@ -50,6 +57,12 @@ def parse_phrase_book(form, perseus):
 def lexdb(form, lexical):
     c.execute('INSERT INTO compound_lexical (form, lexical) '
             'VALUES (?, ?)', (form, lexical) )
+    conn.commit()
+
+
+def roots_table(lexical, perseus_morph, form):
+    c.execute('INSERT INTO roots_table VALUES (?, ?, ?)', 
+            (lexical, persus_morph, form)
     conn.commit()
 
 
@@ -86,28 +99,10 @@ def read_cruncher():
             root_set = set(i[0] for i in parsing_list)
             if len(root_set) == 1:
                 lexdb(form, root_set.pop())
-                
-
-=======
-def read_cruncher():
-	c.execute('SELECT inflected_form FROM row_values')
-	parse_set = set(tup for tup in c.fetchall())
-	num_forms = len(parse_set)
-	num = 1
-	for form in parse_set:
-		form = form.lower()
-		print("Forms to be parsed:", num, 'of', num_forms)
-		poss_roots = sp.run(['cruncher'], input=form, stdout=sp.PIPE,
-				universal_newlines=True, env=os.environ).stdout
-		poss_roots = poss_roots.replace('<NL>', '').replace('</NL>',
-				'\n').split('\n')
-		try:
-			del poss_roots[0]
-			del poss_roots[-2]
-		except IndexError:
-			error_doc.write(greek.decode(form))
-                
->>>>>>> 88c423a5847581835a1a2af67775ee809ba28063
+            else:
+                for item in parsing_list:
+                    roots_db(item[0], item[1], form)
+            num += 1
 
 
 if __name__ == "__main__":
