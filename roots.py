@@ -11,9 +11,9 @@ c = conn.cursor()
 def create_row_table():
 	c.execute('CREATE TABLE IF NOT EXISTS row_value ' 
 			'(inflected_form TEXT NOT NULL, '
-			'morphology TEXT NOT NULL, ' 
+			'packard TEXT NOT NULL, ' 
 			'etymology TEXT NOT NULL,  '
-			'PRIMARY KEY (morphology, etymology) )')
+			'PRIMARY KEY (packard, etymology) )')
 
 
 def create_phrase_book():
@@ -25,6 +25,7 @@ def create_phrase_book():
 def create_lexical():
     c.execute('CREATE TABLE IF NOT EXISTS compound_lexical '
             '(form TEXT NOT NULL, '
+            'packard TEXT, '
             'lexical TEXT NOT NULL)')
 
 
@@ -35,7 +36,7 @@ def create_roots_table():
             'form TEXT NOT NULL)')
 
 
-def update_db(row):
+def update_row_value_tabledb(row):
 	infl = row[:24].strip()
 	morph = row[24:36].strip()
 	etym_roots = row[36:].strip()
@@ -54,7 +55,7 @@ def parse_phrase_book(form, perseus):
         conn.commit()
     
 
-def lexdb(form, lexical):
+def lexdb(form, _, lexical):
     c.execute('INSERT INTO compound_lexical (form, lexical) '
             'VALUES (?, ?)', (form, lexical) )
     conn.commit()
@@ -62,7 +63,7 @@ def lexdb(form, lexical):
 
 def roots_table(lexical, perseus_morph, form):
     c.execute('INSERT INTO roots_table VALUES (?, ?, ?)', 
-            (lexical, persus_morph, form)
+            (lexical, persus_morph, form))
     conn.commit()
 
 
@@ -98,14 +99,38 @@ def read_cruncher():
                     parse_phrase_book(form, parsing_list[0][1])
             root_set = set(i[0] for i in parsing_list)
             if len(root_set) == 1:
-                lexdb(form, root_set.pop())
+                # Should I look up the value of packard morphology? And how?
+                c.execute('SELECT packard FROM row_value WHERE inflected_form = ?', 
+                        (form))
+                morph = c.fetchall()
+                if len(set(forms) == 1:
+                        morph = morph.pop()
+                else:
+                    print('\n\tRow Values Error\n')
+                    for 
+                
+
+                lexdb(form, _, root_set.pop())
             else:
                 for item in parsing_list:
-                    roots_db(item[0], item[1], form)
+                    roots_table(item[0], item[1], form)
             num += 1
 
 
-if __name__ == "__main__":
+def poly_vale():
+    '''
+    Checks the phrase_book for possible roots for poly valent forms. If the
+    phrase_book doesn't have acceptable forms, it asks the user, and then
+    updates the phrase_book table. 
+    '''
+    
+    
+    
+    
+    
+
+
+if __name__ == '__main__':
     '''
     The purpose of this script is going to be to read through the entire
     LXX files and create a database  of all of the multiword compounds, 
@@ -118,11 +143,17 @@ if __name__ == "__main__":
     need only occur once, or after given, can be queried to answer other ambiguities. 
 
     Database construction:
-    1) inflect forms, packard parsing, roots (one to many; for this one the primary key is going to be the combination of parsing and roots)
+    1) inflect forms, packard parsing, roots (one to many; 
+       for this one the primary key is going to be the combination of parsing and roots)
     2) inflect forms, lexical forms (many to many)
     3) Packard Parsing, cruncher parsing (many to many)
     4) lexical forms, cruncher parsing (many to many)
     '''
+    create_row_table()
+    create_phrase_book()
+    create_lexical()
+    create_roots_table()
+
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('passage', nargs='*') 
@@ -132,5 +163,11 @@ if __name__ == "__main__":
     for doc in keys:
         open(doc)
         for row in doc:
-            if len(row[36:].split()) >= 1:
-                
+            if len(row[36:].strip().split()) >= 1:
+                try:
+                    update_row_value_tabledb(row)
+                except sqlite3.InterfaceError: 
+                    pass 
+            else: 
+                pass 
+    read_cruncher()
