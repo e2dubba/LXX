@@ -2,7 +2,7 @@
 
 import sqlite3
 import os 
-
+import collections as coll 
 
 conn = sqlite3.connect('strongs.db')
 c = conn.cursor()
@@ -103,14 +103,22 @@ def read_cruncher():
                 c.execute('SELECT packard FROM row_value WHERE inflected_form = ?', 
                         (form))
                 morph = c.fetchall()
-                if len(set(forms) == 1:
+                if len(set(morph)) == 1:
                         morph = morph.pop()
                 else:
                     print('\n\tRow Values Error\n')
-                    for 
+                    c.execute('SELECT * FROM row_values WHERE inflected_form '
+                            '= ?', (form))
+                    rows = c.fetchall()
+                    parsing_dict = coll.OrderedDict((x, y) for x, y in
+                            enumerate(parsing_list) 
+                    for row in rows:
+                        print(', '.join(row))
+                        for parsing in 
+
                 
 
-                lexdb(form, _, root_set.pop())
+                lexdb(form, morph, root_set.pop())
             else:
                 for item in parsing_list:
                     roots_table(item[0], item[1], form)
@@ -123,6 +131,7 @@ def poly_vale():
     phrase_book doesn't have acceptable forms, it asks the user, and then
     updates the phrase_book table. 
     '''
+    
     
     
     
