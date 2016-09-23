@@ -67,6 +67,27 @@ def roots_table(lexical, perseus_morph, form):
     conn.commit()
 
 
+def man_up_phrase_book(form, parsing_list):
+    print('\n\tRow Values Error\n')
+    c.execute('SELECT * FROM row_values WHERE inflected_form '
+            '= ?', (form))
+    rows = c.fetchall()
+    parsing_dict = coll.OrderedDict((x, y) for str(x), y in
+            enumerate(parsing_list) )
+    for 
+        for row in rows:
+            print('Row: ' + ', '.join(row))
+            print('\nWhich tupple agrees with the row?\n')
+            for key, value in parsing_dict:
+                print(key + ': ' + value)
+            index_num = input('Type index number: ')
+            morph = parsing_dict[index_num]
+            morph = morph[1]
+    
+
+    lexdb(form, morph, root_set.pop())
+
+
 def read_cruncher():
     '''
     This takes the full list of unparsed forms from the databse and runs it
@@ -106,19 +127,16 @@ def read_cruncher():
                 if len(set(morph)) == 1:
                         morph = morph.pop()
                 else:
-                    print('\n\tRow Values Error\n')
-                    c.execute('SELECT * FROM row_values WHERE inflected_form '
-                            '= ?', (form))
-                    rows = c.fetchall()
-                    parsing_dict = coll.OrderedDict((x, y) for x, y in
-                            enumerate(parsing_list) 
-                    for row in rows:
-                        print(', '.join(row))
-                        for parsing in 
-
-                
-
-                lexdb(form, morph, root_set.pop())
+                    for indi_form in morph:
+                        try:
+                            c.execute('SELECT packard WHERE perseus = ?', (indi_for))
+                            morph = c.fetchall()
+                            if len(morph) = 1:
+                                morph = morph.pop()
+                        except sqlite3.InterfaceError:
+                            man_up_phrase_book()
+                            continue
+                        
             else:
                 for item in parsing_list:
                     roots_table(item[0], item[1], form)
