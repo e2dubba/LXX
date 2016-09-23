@@ -67,14 +67,17 @@ def roots_table(lexical, perseus_morph, form):
     conn.commit()
 
 
-def man_up_phrase_book(form, parsing_list):
+def man_up_phrase_book(form, parsing_list, root_set):
+    '''
+    User interface for adding entries into the morphology phrase_book
+    '''
     print('\n\tRow Values Error\n')
     c.execute('SELECT * FROM row_values WHERE inflected_form '
             '= ?', (form))
     rows = c.fetchall()
     parsing_dict = coll.OrderedDict((x, y) for str(x), y in
             enumerate(parsing_list) )
-    for 
+    for lex in root_set:
         for row in rows:
             print('Row: ' + ', '.join(row))
             print('\nWhich tupple agrees with the row?\n')
@@ -83,9 +86,7 @@ def man_up_phrase_book(form, parsing_list):
             index_num = input('Type index number: ')
             morph = parsing_dict[index_num]
             morph = morph[1]
-    
-
-    lexdb(form, morph, root_set.pop())
+        lexdb(form, morph, lex) 
 
 
 def read_cruncher():
@@ -134,12 +135,11 @@ def read_cruncher():
                             if len(morph) = 1:
                                 morph = morph.pop()
                         except sqlite3.InterfaceError:
-                            man_up_phrase_book()
-                            continue
+                            man_up_phrase_book(form, parsing_list, root_set)
                         
             else:
-                for item in parsing_list:
-                    roots_table(item[0], item[1], form)
+                man_up_phrase_book(form, parsing_list, root_set)
+
             num += 1
 
 
