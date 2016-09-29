@@ -18,15 +18,15 @@ def create_row_table():
 
 
 def create_phrase_book():
-    c.execute('CREATE TABLE IF NOT EXISTS phrase_book ('
-        'packard TEXT NOT NULL, '
-        'perseus TEXT NOT NULL)') 
+    c.execute('CREATE TABLE IF NOT EXISTS phrase_book '
+            '(packard TEXT NOT NULL, '
+            'perseus TEXT PRIMARY KEY)') 
+
 
 def create_lexical():
     c.execute('CREATE TABLE IF NOT EXISTS compound_lexical '
-            '(form TEXT NOT NULL, '
-            'packard TEXT, '
-            'lexical TEXT NOT NULL)')
+            '(eytmology TEXT NOT NULL, '
+            'lexical TEXT PRIMARY KEY)')
 
 
 def create_roots_table():
@@ -46,22 +46,19 @@ def update_row_value_tabledb(row):
     conn.commit()
 	
 
-def parse_phrase_book(form, perseus):
-    form = (form, )
+def up_phrase_book(form, perseus):
     c.execute('SELECT packard FROM row_value WHERE inflected_form = ?',
-            form)
+            (form, ))
     packard = c.fetchall()
     if len(packard) == 1:
-        updating = (form, packard[0])
-    if len(packard) == 1:
         c.execute('INSERT INTO phrase_book (packard, perseus) '
-            'VALUES (?, ?)', (packard, perseus) )
+            'VALUES (?, ?)', (packard[0], perseus) )
         conn.commit()
     
 
-def lexdb(form, _, lexical):
-    c.execute('INSERT INTO compound_lexical (form, lexical) '
-            'VALUES (?, ?)', (form, lexical) )
+def lexdb(etymology, lexical):
+    updating = (etymology, lexical)
+    c.execute('INSERT INTO compound_lexical VALUES (?, ?)', updating)
     conn.commit()
 
 
@@ -78,7 +75,7 @@ def cruncher(form):
     try: 
         poss_roots = poss_roots[1].replace('<NL>', '').split('</NL>')
     except IndexError:
-        error_file(form + '\n')
+        error_file.write(form + '\n')
     if not poss_roots[-1]:
         del poss_roots[-1]
     parsing_list = []
@@ -101,28 +98,31 @@ def man_up_phrase_book(form, parsing_list, root_set):
     rows = c.fetchall()
     parsing_dict = coll.OrderedDict((str(x), y) for x, y in
             enumerate(parsing_list) )
-    print('\n\tRow Values Error\n')
     for lex in root_set:
         for row in rows:
             #try:
             c.execute('SELECT perseus FROM phrase_book WHERE '
                     'packard = ?', (row[1]))
-            morph = c.fetchall().pop()
-            lexdb(form, morph, lex)
-            '''
-            except sqlite3.InterfaceError:
-                print('Row: ' + ', '.join(row))
+            try:
+                perseus = c.fetchall().pop()
+                for tup in parsing_list:
+                    if tup[1] == perseus:
+                        lexdb(row[2], tup[0])
+            except IndexError: #Catch's perseus = c.fetchall().pop() error
+                # provide a user interface to fill out index 
+
+                print('\n\nRow: ' + ', '.join(row))
+                
                 print('\nWhich tupple agrees with the row?\n')
-                for key, value in parsing_dict:
-                    print(key + ': ' + value)
+                for key, value in parsing_dict.items():
+                    print(key + ': ' + str(value))
                 index_num = input('Type index number: ')
-                morph = parsing_dict[index_num]
-                morph = morph[1]
+                correct_parsing = parsing_dict[index_num]
+                perseus = correct_parsing[1]
                 c.execute('INSERT INTO phrase_book (packard, perseus) '
                     'VALUES (?, ?)', (row[1], morph) )
                 conn.commit()
-                lexdb(form, morph, lex) 
-            '''
+                lexdb(row[2], correct_parsing[0]) 
 
 
 def read_cruncher():
@@ -141,18 +141,43 @@ def read_cruncher():
             parsing_list = cruncher(form)
                         
             if len(parsing_list) == 1:
-                    parse_phrase_book(form, parsing_list[0][1])
+                try:
+                    up_phrase_book(form, parsing_list[0][1])
+                except sqlite3.IntegrityError:
+                    continue
             root_set = set(i[0] for i in parsing_list)
             if len(root_set) == 1:
                 # Should I look up the value of packard morphology? And how?
-                form = (form, )
-                c.execute('SELECT packard FROM row_value WHERE inflected_form = ?', 
-                        (form))
-                morph = c.fetchall()
-                if len(set(morph)) == 1:
-                        morph = morph.pop()
+                c.execute('SELECT etymology FROM row_value '
+                        'WHERE inflected_form = ?', (form, ))
+                etym = c.fetchone()
+                try:
+                    lexdb(etym[0], root_set.pop())
+                except TypeError:
+                    error_file.write(form + '\n')
+                '''
+                if len(set(packard)) == 1:
+                        packard = packard.pop()
+                        try:
+                            c.execute('INSERT INTO phrase_book VALUES (?, ?)',
+                                (packard[0], parsing_list[0][1]))
+                            conn.commit()
+                            
+                        except sqlite3.IntegrityError:
+                            continue 
+                c.execute('SELECT etymology FROM row_value '
+                        'WHERE inflected_form = ?', 
+                        form)
+                etymology = c.fetchone()
+                lexdb(etymology, root_set.pop())
+                '''
+            else:
+                man_up_phrase_book(form, parsing_list, root_set)
+                
+
+                '''
                 else:
-                    for indi_form in morph:
+                    for indi_form in packard:
                         try:
                             c.execute('SELECT packard WHERE perseus = ?', (indi_for))
                             morph = c.fetchall()
@@ -160,9 +185,7 @@ def read_cruncher():
                                 morph = morph.pop()
                         except sqlite3.InterfaceError:
                             man_up_phrase_book(form, parsing_list, root_set)
-                        
-            if len(root_set) >= 2:
-                man_up_phrase_book(form, parsing_list, root_set)
+                '''
 
             num += 1
 
