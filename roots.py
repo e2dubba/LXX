@@ -4,6 +4,7 @@ import sqlite3
 import os 
 import collections as coll 
 import subprocess as sp
+from xtermcolor import colorize
 
 conn = sqlite3.connect('../strongs.db')
 c = conn.cursor()
@@ -58,8 +59,11 @@ def up_phrase_book(form, perseus):
 
 def lexdb(etymology, lexical):
     updating = (etymology, lexical)
-    c.execute('INSERT INTO compound_lexical VALUES (?, ?)', updating)
-    conn.commit()
+    try:
+        c.execute('INSERT INTO compound_lexical VALUES (?, ?)', updating)
+        conn.commit()
+    except sqlite3.IntegrityError:
+        pass
 
 
 def roots_table(lexical, perseus_morph, form):
@@ -69,8 +73,8 @@ def roots_table(lexical, perseus_morph, form):
 
 
 def cruncher(form):
-    poss_roots = sp.run(['cruncher'], input=form, stdout=sp.PIPE, 
-            universal_newlines=True, env=os.environ).stdout
+    poss_roots = sp.run(['cruncher'], input=form, stderr=sp.DEVNULL, 
+            stdout=sp.PIPE, universal_newlines=True, env=os.environ).stdout
     poss_roots = poss_roots.split('\n')
     try: 
         poss_roots = poss_roots[1].replace('<NL>', '').split('</NL>')
@@ -87,12 +91,16 @@ def cruncher(form):
 
     return parsing_list
 
+def packard_def(packard):
+    cmd = 'diatheke -b Packard -k %s' % (packard)
+    return sp.getoutput(cmd)
+
 
 def man_up_phrase_book(form, parsing_list, root_set):
     '''
     User interface for adding entries into the morphology phrase_book
     '''
-    form = (form, )
+    form = (form.upper(), )
     c.execute('SELECT * FROM row_value WHERE inflected_form '
             '= ?', (form))
     rows = c.fetchall()
@@ -102,7 +110,8 @@ def man_up_phrase_book(form, parsing_list, root_set):
         for row in rows:
             #try:
             c.execute('SELECT perseus FROM phrase_book WHERE '
-                    'packard = ?', (row[1]))
+                    'packard = ?', (row[1], ))
+            perseus = c.fetchall()
             try:
                 perseus = c.fetchall().pop()
                 for tup in parsing_list:
@@ -110,19 +119,28 @@ def man_up_phrase_book(form, parsing_list, root_set):
                         lexdb(row[2], tup[0])
             except IndexError: #Catch's perseus = c.fetchall().pop() error
                 # provide a user interface to fill out index 
+                # I need to provide a way of selecting none of the above
 
                 print('\n\nRow: ' + ', '.join(row))
+                print(packard_def(row[1]))
                 
-                print('\nWhich tupple agrees with the row?\n')
+                print('Which tupple agrees with the row?\n')
                 for key, value in parsing_dict.items():
                     print(key + ': ' + str(value))
+                print(str(len(parsing_dict)) + ': ' + 'None')
                 index_num = input('Type index number: ')
-                correct_parsing = parsing_dict[index_num]
-                perseus = correct_parsing[1]
-                c.execute('INSERT INTO phrase_book (packard, perseus) '
-                    'VALUES (?, ?)', (row[1], morph) )
-                conn.commit()
-                lexdb(row[2], correct_parsing[0]) 
+                try:
+                    correct_parsing = parsing_dict[str(index_num)]
+                    perseus = correct_parsing[1]
+                    try:
+                        c.execute('INSERT INTO phrase_book (packard, perseus) '
+                            'VALUES (?, ?)', (row[1], perseus) )
+                        conn.commit()
+                    except sqlite3.IntegrityError:
+                        break
+                    lexdb(row[2], correct_parsing[0]) 
+                except KeyError:
+                    continue
 
 
 def read_cruncher():
@@ -136,13 +154,20 @@ def read_cruncher():
     num_forms = len(parse_set)
     num = 1
     for form in parse_set:
-            
+            print(num, 'of ', num_forms)
             form = form[0].lower()
             parsing_list = cruncher(form)
                         
+            if not parsing_list:
+                error_file.write(form + '\n')
+                continue
             if len(parsing_list) == 1:
                 try:
                     up_phrase_book(form, parsing_list[0][1])
+                    c.execute('SELECT etymology FROM row_value '
+                            'WHERE inflected_form = ?', (form.upper(), ))
+                    etymology = c.fetchone()
+                    lexdb(etymology[0], parsing_list[0][0])
                 except sqlite3.IntegrityError:
                     continue
             root_set = set(i[0] for i in parsing_list)
@@ -152,40 +177,12 @@ def read_cruncher():
                         'WHERE inflected_form = ?', (form, ))
                 etym = c.fetchone()
                 try:
+                    print(colorize(etym[0] + root_set.pop(), ansi=3))
                     lexdb(etym[0], root_set.pop())
                 except TypeError:
                     error_file.write(form + '\n')
-                '''
-                if len(set(packard)) == 1:
-                        packard = packard.pop()
-                        try:
-                            c.execute('INSERT INTO phrase_book VALUES (?, ?)',
-                                (packard[0], parsing_list[0][1]))
-                            conn.commit()
-                            
-                        except sqlite3.IntegrityError:
-                            continue 
-                c.execute('SELECT etymology FROM row_value '
-                        'WHERE inflected_form = ?', 
-                        form)
-                etymology = c.fetchone()
-                lexdb(etymology, root_set.pop())
-                '''
             else:
                 man_up_phrase_book(form, parsing_list, root_set)
-                
-
-                '''
-                else:
-                    for indi_form in packard:
-                        try:
-                            c.execute('SELECT packard WHERE perseus = ?', (indi_for))
-                            morph = c.fetchall()
-                            if len(morph) == 1:
-                                morph = morph.pop()
-                        except sqlite3.InterfaceError:
-                            man_up_phrase_book(form, parsing_list, root_set)
-                '''
 
             num += 1
 
