@@ -5,6 +5,7 @@ import os
 import collections as coll 
 import subprocess as sp
 from xtermcolor import colorize
+import re 
 
 conn = sqlite3.connect('../strongs.db')
 c = conn.cursor()
@@ -91,9 +92,16 @@ def cruncher(form):
 
     return parsing_list
 
+
 def packard_def(packard):
     cmd = 'diatheke -b Packard -k %s' % (packard)
-    return sp.getoutput(cmd)
+    definition = sp.getoutput(cmd)
+    definition = definition.split(':', maxsplit=1)[1].split(':', maxsplit=1)
+    defi2 = re.split(r'([A-Z][a-z]*):', definition[1])
+    defi2.insert(0, definition[0].strip())
+    def_dict = coll.OrderedDict(zip(defi2[0::2], defi2[1::2]))
+    print(def_dict)
+    return def_dict
 
 
 def man_up_phrase_book(form, parsing_list, root_set):
@@ -122,7 +130,10 @@ def man_up_phrase_book(form, parsing_list, root_set):
                 # I need to provide a way of selecting none of the above
 
                 print('\n\nRow: ' + ', '.join(row))
-                print(packard_def(row[1]))
+                #print(packard_def(row[1]))
+                def_dict = packard_def(row[1])
+                for key, value in def_dict.items():
+                    print('\t' + key + ':\t' + value)
                 
                 print('Which tupple agrees with the row?\n')
                 for key, value in parsing_dict.items():
@@ -136,6 +147,7 @@ def man_up_phrase_book(form, parsing_list, root_set):
                         c.execute('INSERT INTO phrase_book (packard, perseus) '
                             'VALUES (?, ?)', (row[1], perseus) )
                         conn.commit()
+                        break
                     except sqlite3.IntegrityError:
                         break
                     lexdb(row[2], correct_parsing[0]) 
@@ -211,7 +223,9 @@ if __name__ == '__main__':
     parser.add_argument('argus', nargs='*') 
     args = parser.parse_args()
     books =  args.argus
+
     error_file = open('../ErrorList', 'w')
+
     create_row_table()
     create_phrase_book()
     create_lexical()
