@@ -1,0 +1,179 @@
+{
+	"Column1":
+	{
+		"V1": "present",
+		"V2": "present",
+		"V3": "present",
+		"V4": "present",
+		"V5": "present",
+		"V6": "present",
+		"V7": "present",
+		"V8": "present",
+		"V9": "present",
+		"VA": "aorist",
+		"VB": "aorist",
+		"VZ": "aorist",
+		"VH": "aorist",
+		"VE": "aorist",
+		"VO": "aorist",
+		"VC": "aorist",
+		"VD": "aorist",
+		"VV": "aorist",
+		"VS": "aorist",
+		"VQ": "aorist",
+		"VX": "perfect active",
+		"VM": "perfect middle",
+		"VP": "perfect middle",
+		"VT": "perfect",
+		"VK": "perfect",
+		"VF": "future",
+		"VF2": "future",
+		"VF3": "future",
+		"VFX": "future perfect",
+		"N1": "1st Declension",
+		"N1A": "1st Declension",
+		"N1M": "1st Declension",
+		"N1S": "1st Declension",
+		"N1T": "1st Declension",
+		"N2": "2nd Declension",
+		"N2N": "2nd Declension",
+		"N3": "3rd Declension",
+		"N3D": "3rd Declension",
+		"N3E": "3rd Declension",
+		"N3F": "3rd Declension",
+		"N3G": "3rd Declension",
+		"N3H": "3rd Declension",
+		"N3I": "3rd Declension",
+		"N3K": "3rd Declension",
+		"N3M": "3rd Declension",
+		"N3N": "3rd Declension",
+		"N3P": "3rd Declension",
+		"N3R": "3rd Declension",
+		"N3S": "3rd Declension",
+		"N3T": "3rd Declension",
+		"N3U": "3rd Declension",
+		"N3V": "3rd Declension",
+		"N3W": "3rd Declension",
+		"N": "Indeclinable Noun",
+		"A1": "adjective",
+		"A1A": "adjective",
+		"A1B": "adjective",
+		"A1C": "adjective",
+		"A1S": "adjective",
+		"A3": "adjective",
+		"A3E": "adjective",
+		"A3H": "adjective",
+		"A3N": "adjective",
+		"A3U": "adjective",
+		"A3C": "adjective",
+		"RA": "article",
+		"RD": "demonstrative",
+		"RI": "interrogative",
+		"RP": "personal",
+		"RR": "relative",
+		"RX": "O(/STIS",
+		"C": "conjunction",
+		"X": "particle",
+		"I": "interjection",
+		"M": "preposition",
+		"D": "adverb"
+	}, 
+"Column2": 
+	{
+	"Verb2": 
+		{
+		"col.1":
+			{
+				"P": "present",
+				"I": "imperfect",
+				"F": "future",
+				"A": "aorist",
+				"X": "perfect",
+				"Y": "pluperfect"
+			},
+		"col.2":
+			{
+				"A": "active",
+				"M": "middle",
+				"P": "passive"
+			},
+		"col.3":
+			{
+				"I": "indicative",
+				"D": "imperative",
+				"S": "subjunctive",
+				"O": "optative",
+				"N": "infinitive",
+				"P": "ptcp"
+			},
+		"col.4":
+			{
+				"1": "first",
+				"2": "second",
+				"3": "third"
+			},
+		"col.5": 
+			{
+				"S": "sing",
+				"D": "dual", 
+				"P": "pl"
+			},
+		"col.6": 
+			{
+				"m": "masculine",
+				"f": "feminine"
+			}
+		},
+	"Noun2":
+		{
+		"col.1":
+			{
+				"N": "nom",
+				"G": "gen",
+				"D": "dat",
+				"A": "accus",
+				"V": "vocative"
+			},
+		"col.2":
+			{
+				"S": "sing",
+				"D": "dual",
+				"P": "pl"
+			}, 
+		"col.3": 
+			{
+				"M": "masc",
+				"F": "fem",
+				"N": "Neut"
+			}
+		},
+	"Adj2": 
+		{
+		"col.1":
+			{
+				"N": "nom",
+				"G": "gen",
+				"D": "dat",
+				"A": "accus",
+				"V": "vocative"
+			},
+		"col.2":
+			{
+				"S": "sing",
+				"D": "dual",
+				"P": "pl"
+			},
+		"col.3": 
+			{
+				"M": "masc",
+				"F": "fem",
+				"N": "Neut"
+			},
+		"col.4":
+			{
+				"C": "comparative",
+				"S": "superlative"
+			}
+		}
+	}
+}
