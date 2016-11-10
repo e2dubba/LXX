@@ -1,35 +1,35 @@
 {
 	"Column1":
 	{
-		"V1": "present",
-		"V2": "present",
-		"V3": "present",
-		"V4": "present",
-		"V5": "present",
-		"V6": "present",
-		"V7": "present",
-		"V8": "present",
-		"V9": "present",
-		"VA": "aorist",
-		"VB": "aorist",
-		"VZ": "aorist",
-		"VH": "aorist",
-		"VE": "aorist",
-		"VO": "aorist",
-		"VC": "aorist",
-		"VD": "aorist",
-		"VV": "aorist",
-		"VS": "aorist",
-		"VQ": "aorist",
-		"VX": "perfect active",
+		"V1": "pres",
+		"V2": "pres",
+		"V3": "pres",
+		"V4": "pres",
+		"V5": "pres",
+		"V6": "pres",
+		"V7": "pres",
+		"V8": "pres",
+		"V9": "pres",
+		"VA": "aor",
+		"VB": "aor",
+		"VZ": "aor",
+		"VH": "aor",
+		"VE": "aor",
+		"VO": "aor",
+		"VC": "aor",
+		"VD": "aor",
+		"VV": "aor",
+		"VS": "aor",
+		"VQ": "aor",
+		"VX": "perfect act",
 		"VM": "perfect middle",
 		"VP": "perfect middle",
 		"VT": "perfect",
 		"VK": "perfect",
-		"VF": "future",
-		"VF2": "future",
-		"VF3": "future",
-		"VFX": "future perfect",
+		"VF": "fut",
+		"VF2": "fut",
+		"VF3": "fut",
+		"VFX": "fut perfect",
 		"N1": "1st Declension",
 		"N1A": "1st Declension",
 		"N1M": "1st Declension",
@@ -84,44 +84,44 @@
 		{
 		"col.1":
 			{
-				"P": "present",
-				"I": "imperfect",
-				"F": "future",
-				"A": "aorist",
-				"X": "perfect",
-				"Y": "pluperfect"
+				"P": "pres",
+				"I": "imperf",
+				"F": "fut",
+				"A": "aor",
+				"X": "perf",
+				"Y": "plup"
 			},
 		"col.2":
 			{
-				"A": "active",
-				"M": "middle",
-				"P": "passive"
+				"A": "act",
+				"M": "mid",
+				"P": "pass"
 			},
 		"col.3":
 			{
-				"I": "indicative",
-				"D": "imperative",
+				"I": "ind",
+				"D": "imperat",
 				"S": "subjunctive",
-				"O": "optative",
-				"N": "infinitive",
-				"P": "ptcp"
+				"O": "opt",
+				"N": "inf",
+				"P": "part"
 			},
 		"col.4":
 			{
-				"1": "first",
-				"2": "second",
-				"3": "third"
+				"1": "1st",
+				"2": "2nd",
+				"3": "3rd"
 			},
 		"col.5": 
 			{
-				"S": "sing",
+				"S": "sg",
 				"D": "dual", 
 				"P": "pl"
 			},
 		"col.6": 
 			{
-				"m": "masculine",
-				"f": "feminine"
+				"M": "masc",
+				"F": "fem"
 			}
 		},
 	"Noun2":
@@ -131,12 +131,12 @@
 				"N": "nom",
 				"G": "gen",
 				"D": "dat",
-				"A": "accus",
-				"V": "vocative"
+				"A": "acc",
+				"V": "voc"
 			},
 		"col.2":
 			{
-				"S": "sing",
+				"S": "sg",
 				"D": "dual",
 				"P": "pl"
 			}, 
@@ -144,7 +144,7 @@
 			{
 				"M": "masc",
 				"F": "fem",
-				"N": "Neut"
+				"N": "neut"
 			}
 		},
 	"Adj2": 
@@ -154,8 +154,8 @@
 				"N": "nom",
 				"G": "gen",
 				"D": "dat",
-				"A": "accus",
-				"V": "vocative"
+				"A": "acc",
+				"V": "voc"
 			},
 		"col.2":
 			{
@@ -167,7 +167,7 @@
 			{
 				"M": "masc",
 				"F": "fem",
-				"N": "Neut"
+				"N": "neut"
 			},
 		"col.4":
 			{

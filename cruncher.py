@@ -11,9 +11,11 @@ def cruncher(form):
         poss_roots = poss_roots[1].replace('<NL>', '').split('</NL>')
     except IndexError:
         print('Error! ' + form + '\n')
+        
     parsing_list = []
     for item in poss_roots:
         templist = item[2:].split(maxsplit=1)
+        print(templist)
         temptup = (templist[0],
                 templist[1].split('\t', maxsplit=1)[0])
         parsing_list.append(temptup)
@@ -21,10 +23,6 @@ def cruncher(form):
     return parsing_list
 
 if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('form', nargs='*')
-    args = parser.parse_args()
-    key = args.form
-    print(cruncher(key))
+    import sys
+    print(cruncher(sys.argv[1]))
     
