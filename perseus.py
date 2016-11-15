@@ -28,10 +28,11 @@ def pretty_print(dicty):
 
 def check_parse(row, packard):
     '''
-    This isn't really working. I need to seperate the parts of speech in the
-    very beginning. I need to be working with in each part of speech as a
-    whole from the start, because the json look ups aren't built for easy
-    transferability. 
+    This sets the variable in the beginning in order to facilitate json look
+    up. I still need to finish the part where the json look up writes the
+    Lexical form and returns the proper varibles. The issue is, if there are
+    still more viable lexical forms after the first sorting, what is the next
+    best delimiter? 
     '''
     dicty = perseus(row[0].lower())
     packing = row[1].split()
@@ -103,7 +104,7 @@ def check_parse(row, packard):
             etymology = row[2]
             return lexical, part_of_speech, etymology 
         
-        if len(plex) != 1:
+        if not len(plex):
             #write error
             print('Error!')
 
@@ -121,3 +122,6 @@ if __name__ == '__main__':
     packard = json.load(fp)
     pretty_print(dicty)
     
+'''
+
+'''
