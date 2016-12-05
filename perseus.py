@@ -39,7 +39,7 @@ def check_parse(row, packard):
     pospeech = packing[0]
     plex ={}
     if pospeech[0] == 'V':
-        packd_speech = packard['Column2']['Verb2']['col.2'][packing[1][1]] 
+        packd_speech = packard['Column2']['Verb2']['col.1'][packing[1][0]] 
         
     if pospeech[0] == 'N':
         packd_speech = packard['Column2']['Noun2']['col.1'][packing[1][0]] 
@@ -48,21 +48,25 @@ def check_parse(row, packard):
         packd_speech = packard['Column2']['Adj2']['col.1'][packing[1][0]]
 
     #What about C? 
-    new_less = [x for x in dicty[lex] if packd_speech in x]
-    plex[new_less] = lex
+    for lex in dicty:
+	    new_less = [x for x in dicty[lex] if packd_speech in x]
+	    if len(new_less) == 1:
+		    new_less = new_less.pop()
+	    if len(new_less) != 1:
+		    print('Error!!!\t' + lex)
+	    print(new_less)
+	    plex[lex] = new_less
+    return plex
 
-    if packing[0][0] == 'V':
+
+        
+'''
+if packing[0][0] == 'V':
         pospeech = packing[1][0]
     else:
         pospeech = packing[0][:2]
     new_lex = {}
     for lex in dicty:
-        '''
-        the following comprehension will check to see which dictionary key
-        parses like the Packard notation indicates. This needs to be narrowed a
-        bit. I need to narrow it down if their is more than one lexical item
-        that agrees with the parsings. 
-        '''
         less = [x for x in dicty[lex] if packard['Column2']['Verb2'][pospeech] in x]
         new_lex[lex] = less 
 
@@ -121,7 +125,5 @@ if __name__ == '__main__':
     fp = open('packard.json')
     packard = json.load(fp)
     pretty_print(dicty)
-    
-'''
 
 '''
