@@ -59,6 +59,16 @@ def check_parse(row, packard):
     return plex
 
 
+if __name__ == '__main__':
+    import sys
+    import json 
+    dicty = perseus(sys.argv[1])
+    fp = open('packard.json')
+    packard = json.load(fp)
+    pretty_print(dicty)
+
+
+
         
 '''
 if packing[0][0] == 'V':
