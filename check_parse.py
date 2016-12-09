@@ -1,11 +1,24 @@
 #!/usr/in/env python3
 
-
 import sqlite3
 import json
 conn = sqlite3.connect('/home/echindod3/strongs.db')
 c = conn.cursor()
 from perseus import perseus
+
+
+def create_etym_tab():
+    c.execute('CREATE TABLE IF NOT EXISTS etymology_lexical '
+            '(etymology TEXT NOT NULL, '
+            'part_of_speech TEXT NOT NULL, '
+            'lexical TEXT NOT NULL)')
+    conn.commit()
+
+
+def up_etym_to_lex(etymology, part_of_speech, lexical):
+    c.execute('INSERT INTO etymology_lexical VALUES (?, ?, ?)',
+            (etymology, part_of_speech, lexical))
+    conn.commit() 
 
 
 def check_parse(row, packard):
@@ -23,7 +36,7 @@ def check_parse(row, packard):
     if len(dicty) == 1:
         for key in dicty.keys():
             lexical = key
-        return lexical, part_of_speech, etymology
+        return etymology, part_of_speech, lexical 
     
     elif not dicty:
         pass
@@ -32,7 +45,7 @@ def check_parse(row, packard):
     else: 
        packd_speech = posgen(row[1], num=1)
        lexical = dicty_sorter(dicty, packd_speech)
-       return lexical, part_of_speech, etymology
+       return etymology, part_of_speech, lexical 
 
 
 def dicty_sorter(dicty, packd_speech):
@@ -131,6 +144,8 @@ def posgen(packard, num):
     if pospeech[0] == 'A': 
         packd_speech = packard['Column2']['Adj2'][col][packing[1][p]]
 
+    if pospeech[0] == 'C':
+        packd_speech = 'conj'
     return packd_speech
 
 
@@ -138,12 +153,18 @@ if __name__ == '__main__':
     fp = open('packard.json')
     packard = json.load(fp)
     c.execute('select * from row_value')
-    tupylist = c.fetchmany(30)
+    tupylist = c.fetchall()
+    error_file = open('ErrorFile.txt', 'w')
+    create_etym_tab()
+
     for row in tupylist:
         try: 
-            lexical, part_of_speech, etymology = check_parse(row, packard)
+            etymology, part_of_speech, lexical = check_parse(row, packard)
+            up_etym_to_lex(etymology, part_of_speech, lexical)
         except TypeError: 
+            error_file.write(', '.join(row))
             print('  Type Error ' + row[0])
             pass
         print(lexical, part_of_speech, etymology)
+        #up_etym_to_lex(etymology, part_of_speech, lexical)
     
