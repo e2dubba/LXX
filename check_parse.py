@@ -5,6 +5,7 @@ import json
 conn = sqlite3.connect('/home/echindod3/strongs.db')
 c = conn.cursor()
 from perseus import perseus
+from betacode import greek
 
 
 def create_etym_tab():
@@ -76,7 +77,6 @@ def dicty_sorter(dicty, packd_speech):
                 num = 1
                 packd_speech = posgen(row[1], num)
                 new_less = [x for x in dicty[lex] if packd_speech in x]
-                print(len(new_less))
                 if not new_less:
                     print('Not New Less!')
                 else:
@@ -146,6 +146,9 @@ def posgen(packard, num):
 
     if pospeech[0] == 'C':
         packd_speech = 'conj'
+    
+    if pospeech[0] == 'D':
+        packd_speech = 'adv'
     return packd_speech
 
 
@@ -158,6 +161,7 @@ if __name__ == '__main__':
     create_etym_tab()
 
     for row in tupylist:
+        print(greek.decode(row[0]))
         try: 
             etymology, part_of_speech, lexical = check_parse(row, packard)
             up_etym_to_lex(etymology, part_of_speech, lexical)
@@ -165,6 +169,5 @@ if __name__ == '__main__':
             error_file.write(', '.join(row))
             print('  Type Error ' + row[0])
             pass
-        print(lexical, part_of_speech, etymology)
         #up_etym_to_lex(etymology, part_of_speech, lexical)
     
