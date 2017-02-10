@@ -166,7 +166,7 @@ if __name__ == '__main__':
             etymology, part_of_speech, lexical = check_parse(row, packard)
             up_etym_to_lex(etymology, part_of_speech, lexical)
         except TypeError: 
-            error_file.write(', '.join(row))
+            error_file.write(', '.join(row) + '\n')
             print('  Type Error ' + row[0])
             pass
         #up_etym_to_lex(etymology, part_of_speech, lexical)
