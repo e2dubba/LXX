@@ -1,4 +1,6 @@
-#LXX
+# LXX Python Module Maker
 
-This is a script to turns the CATSS data into OSIS xml, with Strongs numbers
-and Lexical words. It is still a work in progress
+The purpose of this module is to take the CATSS data and create a valid OSIS
+XML document for the Sword Project, with Strongs numbers and lexical forms.
+
+
