@@ -3,30 +3,50 @@
 This app is for taking the plain text mlxx files and diogenese 
 output to create speciall objects to import into lxx.py
 '''
-
-class MlxxWords:
-    def __init__(self, reference, words):
-        self.reference = reference 
-        self.book, self.number = reference.split()
-        self.chapter, self.verse = map(int, self.number.split(':'))
-        self.data = words 
-
-
-class DlxxWords:
-    def __init__(self, verse):
-        def verse_spliter(verse):
-            book_chap, verse, text = verse.split(':', 3)
-            text = text.replace('(', '')
-            words = text.split(')')
-            words = [x.split() for x in words]
-            book_chap = book_chap.split()
-            chap = book_chap.pop()
-            book = ' '.join(book_chap)
-            return book, chap, verse, words 
-        self.book, self.chap, self.verse, self.words = verse_spliter(verse)
+BIBLEBOOKS = ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
+	'Joshua', 'Judges', 'Ruth', 'I Samuel', 'II Samuel', 'I Kings', 
+	'II Kings', 'I Chronicles ', 'II Chronicles', 'Ezra', 'Nehemiah', 'Esther',
+	'Job', 'Psalms', 'Proverbs', 'Ecclesiastes', 'Song', 'Isaiah',
+	'Jeremiah', 'Lamentations', 'Ezekiel', 'Daniel', 'Hosea', 'Joel',
+	'Amos', 'Obadiah', 'Jonah', 'Micah', 'Nahum', 'Habakkuk', 'Zephaniah',
+	'Haggai', 'Zechariah', 'Malachi', 'Matthew', 'Mark', 'Luke', 'John',
+	'Acts', 'Romans', 'I Corinthians', 'II Corinthians', 'Galatians',
+	'Ephesians', 'Philippians', 'Colossians', 'I Timothy', 'II Timothy', 
+	'I Thessalonians', 'II Thessalonians', 'Titus', 'Philemon', 'Hebrews',
+	'James', 'I Peter', 'II Peter', 'I John', 'II John', 'III John', 'Jude',
+	'Revelation']
 
 
+class LxxWords: 
+    def __init__(self, book, chap, verse, words_list_tuple):
+        self.book = book
+        self.chap = chap 
+        self.verse = verse 
+        self.words_list_tuple = words_list_tuple
+        self.numb = 0
 
+    def word_check(compare_word):
+        return compare_word
+
+
+def split_mlxx
+
+
+
+
+def split_diogenese_gen(diogenese_lxx_file):
+    for line in diogenese_lxx_file:
+        book_chap, verse, text = line.split(':', 3)
+        text = text.replace('(', '')
+        words = text.split(')')
+        words = [x.split() for x in words]
+        book, chap = book_chap.split()
+        yield LxxWords(book, chap, verse, words_list)
+
+
+'''
+def fuzzy_matcher(term):
+'''    
 
 def iter_mlxx(path):
     '''
@@ -56,3 +76,27 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+
+'''
+class MlxxWords:
+
+    def __init__(self, reference, words):
+        self.reference = reference 
+        self.book, self.number = reference.split()
+        self.chapter, self.verse = map(int, self.number.split(':'))
+        self.data = words 
+
+
+class DlxxWords:
+
+    def __init__(self, verse):
+        book_chap, verse, text = verse.split(':', 3)
+        text = text.replace('(', '')
+        words = text.split(')')
+        self.words = [x.split() for x in words]
+        book_chap = book_chap.split()
+        self.chap = book_chap.pop()
+        self.book = ' '.join(book_chap)
+'''
