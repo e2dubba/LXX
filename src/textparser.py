@@ -3,6 +3,13 @@
 This app is for taking the plain text mlxx files and diogenese 
 output to create speciall objects to import into lxx.py
 '''
+
+
+import re 
+from betacode import greek
+
+
+
 BIBLEBOOKS = ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
 	'Joshua', 'Judges', 'Ruth', 'I Samuel', 'II Samuel', 'I Kings', 
 	'II Kings', 'I Chronicles ', 'II Chronicles', 'Ezra', 'Nehemiah', 'Esther',
@@ -17,6 +24,32 @@ BIBLEBOOKS = ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
 	'Revelation']
 
 
+BETACODE_STRIP = re.compile(r'[^A-Z]*')
+
+
+class WordParsings:
+    def __init__(self, word_list):
+        self.word = word_list[0]
+        self.parsing = word_list[1]
+        self.lexical = word_list[2]
+        self.lexical = word_list[3]
+        self.strongs = word_list[4]
+
+
+    def word_check(self):
+        plaintxt = re.sub(BETACODE_STRIP, '', self.word)
+        try:
+            plaintxt = greek.decode(plaintxt)
+        except betacode.greek.BetacodeError:
+            plaintxt = plaintxt
+        
+
+
+
+    def __eq__(self, other_WordParsings):
+
+        
+
 class LxxWords: 
     def __init__(self, book, chap, verse, words_list_tuple):
         self.book = book
@@ -24,6 +57,8 @@ class LxxWords:
         self.verse = verse 
         self.words_list_tuple = words_list_tuple
         self.numb = 0
+
+    def __eq__(self, other_LxxWords):
 
     def word_check(compare_word):
         return compare_word
