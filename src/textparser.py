@@ -30,19 +30,24 @@ BETACODE_STRIP = re.compile(r'[^A-Z]*')
 class WordParsings:
     def __init__(self, word_list):
         self.word = word_list[0]
-        self.parsing = word_list[1]
-        self.lexical = word_list[2]
+        self.word_un = word_list[1]
+        self.parsing = word_list[2]
         self.lexical = word_list[3]
         self.strongs = word_list[4]
 
 
-    def word_check(self):
-        plaintxt = re.sub(BETACODE_STRIP, '', self.word)
-        try:
+    def deroma_lex(self):
+        if self.word != '':
+            plaintxt = re.sub(BETACODE_STRIP, '', self.word)
             plaintxt = greek.decode(plaintxt)
-        except betacode.greek.BetacodeError:
-            plaintxt = plaintxt
+        else:
+            plaintxt = self.word_un
+        return plaintxt
+
+    
+    def word_check(self):
         
+               
 
 
 
