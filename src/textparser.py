@@ -50,8 +50,11 @@ class WordParsings:
         
 
     def __eq__(self, other_WordParsings):
-        return self.deroma_lex == other_WordParsings.deroma_lex and \
-                self.
+        truth_value = self.deroma_lex == other_WordParsings.deroma_lex 
+        if truth_value: 
+            
+        return 
+                
 
         
 
