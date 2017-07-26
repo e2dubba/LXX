@@ -37,21 +37,21 @@ class WordParsings:
 
 
     def deroma_lex(self):
-        if self.word != '':
+        if self.word == '':
+            plaintxt = self.word_un
+        else:
             plaintxt = re.sub(BETACODE_STRIP, '', self.word)
             plaintxt = greek.decode(plaintxt)
-        else:
-            plaintxt = self.word_un
         return plaintxt
 
     
     def word_check(self):
+
         
-               
-
-
 
     def __eq__(self, other_WordParsings):
+        return self.deroma_lex == other_WordParsings.deroma_lex and \
+                self.
 
         
 
