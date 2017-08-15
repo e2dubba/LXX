@@ -8,6 +8,7 @@ output to create speciall objects to import into lxx.py
 import re 
 from betacode import greek
 from perseus import perseus
+import lxml.etree as et
 
 
 
@@ -31,14 +32,12 @@ PHRASE_JSON = {}
 perseus_regex = re.compile('doric|aeolic|attic|epic|doric|contr')
 
 
-def quick_perseus(lemma):
+def quick_perseus(lemma, packard):
     perseus_dict = perseus(lemma)
-    
+    if len(perseus_dict) == 1:
+        if len(perseus_dict.values()) == 1:
+            PHRASE_JSON[packard] = re.sub(perseus_regex, '', perseus_dict[0])
 
-     
-
-
-    
 
 class WordParsings:
     def __init__(self, word_list):
@@ -57,38 +56,37 @@ class WordParsings:
             plaintxt = greek.decode(plaintxt)
         return plaintxt
 
-    
-    def word_check(self):
-
+    def osis_output(self, chap_ele, word_num):
+        word_ele = et.SubElement(chap_ele, 'w')
+        if not self.strongs:
+            word_ele.attrib['lemma'] = 'Strong:' + self.lexical
+        else:
+            word_ele.attrib['lemma'] = 'Strong:' + self.lexical + \
+                    ' lemma.strong:G' + self.strongs
+        word_ele.attrib['morph'] = 'packard:' + self.parsing
+        word_ele.attrib['wn'] = '%0.3d'% word_num
+        word_ele.text = greek.decode(self.word)
         
 
     def __eq__(self, other_WordParsings):
         truth_value = self.deroma_lex == other_WordParsings.deroma_lex 
         if truth_value: 
-            
-             
-
-            
+           quick_perseus(self.word, packard) 
         return truth_value
                 
 
-        
-
 class LxxWords: 
-    def __init__(self, book, chap, verse, words_list_tuple):
+    def __init__(self, book, chap, verse, words_parsing_tuple):
         self.book = book
         self.chap = chap 
         self.verse = verse 
-        self.words_list_tuple = words_list_tuple
+        self.words_list_tuple = words_parsing_tuple
         self.numb = 0
 
-    def __eq__(self, other_LxxWords):
-
-    def word_check(compare_word):
-        return compare_word
 
 
-def split_mlxx
+def split_mlxx(line):
+    return line
 
 
 
