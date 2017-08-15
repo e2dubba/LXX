@@ -7,6 +7,7 @@ output to create speciall objects to import into lxx.py
 
 import re 
 from betacode import greek
+from perseus import perseus
 
 
 
@@ -26,6 +27,18 @@ BIBLEBOOKS = ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
 
 BETACODE_STRIP = re.compile(r'[^A-Z]*')
 
+PHRASE_JSON = {}
+perseus_regex = re.compile('doric|aeolic|attic|epic|doric|contr')
+
+
+def quick_perseus(lemma):
+    perseus_dict = perseus(lemma)
+    
+
+     
+
+
+    
 
 class WordParsings:
     def __init__(self, word_list):
@@ -52,6 +65,7 @@ class WordParsings:
     def __eq__(self, other_WordParsings):
         truth_value = self.deroma_lex == other_WordParsings.deroma_lex 
         if truth_value: 
+            
              
 
             
