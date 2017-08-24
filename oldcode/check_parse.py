@@ -1,4 +1,4 @@
-#!/usr/in/env python3
+#!/usr/bin/env python3
 
 import sqlite3
 import json
@@ -156,11 +156,11 @@ if __name__ == '__main__':
     fp = open('packard.json')
     packard = json.load(fp)
     c.execute('select * from row_value')
-    tupylist = c.fetchall()
+    tuple_rows = c.fetchall()
     error_file = open('ErrorFile.txt', 'w')
     create_etym_tab()
 
-    for row in tupylist:
+    for row in tuple_rows:
         print(greek.decode(row[0]))
         try: 
             etymology, part_of_speech, lexical = check_parse(row, packard)

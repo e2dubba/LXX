@@ -9,7 +9,7 @@ import re
 from betacode import greek
 from perseus import perseus
 import lxml.etree as et
-
+import sqlite3 
 
 
 BIBLEBOOKS = ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
@@ -39,20 +39,35 @@ def quick_perseus(lemma, packard):
             PHRASE_JSON[packard] = re.sub(perseus_regex, '', perseus_dict[0])
 
 
-class WordParsings:
-    def __init__(self, word_list):
-        self.word = word_list[0]
-        self.word_un = word_list[1]
-        self.parsing = word_list[2]
-        self.lexical = word_list[3]
-        self.strongs = word_list[4]
+    
 
+
+
+class WordParsings:
+    '''
+
+    '''
+    def __init__(self, wordy, word_un, parsing, lexical, strongs, etymology):
+        self.wordy = wordy
+        self.word_un = word_un
+        self.parsing = parsing
+        self.lexical = lexical # to get the lexical form use lexical_lookup.py
+        self.strongs = strongs
+        self.etymology = etymology
+        '''
+        self.wordy = word_list[0] # Accented BetaCode Greek
+        self.word_un = word_list[1] # unaccented unicode greek
+        self.parsing = word_list[2] # Packard Parsing
+        self.lexical = word_list[3] # Lexical form
+        self.strongs = word_list[4] # Strongs number 
+        self.etymology = word_list[5] # Etymology of the words from CATSS
+        '''
 
     def deroma_lex(self):
-        if self.word == '':
+        if self.wordy == '':
             plaintxt = self.word_un
         else:
-            plaintxt = re.sub(BETACODE_STRIP, '', self.word)
+            plaintxt = re.sub(BETACODE_STRIP, '', self.wordy)
             plaintxt = greek.decode(plaintxt)
         return plaintxt
 
@@ -65,15 +80,33 @@ class WordParsings:
                     ' lemma.strong:G' + self.strongs
         word_ele.attrib['morph'] = 'packard:' + self.parsing
         word_ele.attrib['wn'] = '%0.3d'% word_num
-        word_ele.text = greek.decode(self.word)
+        word_ele.text = greek.decode(self.wordy)
+
+
+    def __add__(self, other_word):
+        '''
+        Always add `MlxxWord + DlxxWord`. 
+        '''
+        new_word = self.wordy
+        new_word_un = other_word.word_un
+        new_parsing = other_word.parsing
+        new_lexical = 
+
+
         
 
-    def __eq__(self, other_WordParsings):
-        truth_value = self.deroma_lex == other_WordParsings.deroma_lex 
+
+    def __eq__(self, other_word):
+        '''
+        first_num = self.wordy
+        second_num = other_word.wordy
+        return first_num == second_num
+        '''
+        truth_value = self.deroma_lex() == other_word.deroma_lex() 
         if truth_value: 
-           quick_perseus(self.word, packard) 
+           quick_perseus(self.wordy, packard) 
         return truth_value
-                
+
 
 class LxxWords: 
     def __init__(self, book, chap, verse, words_parsing_tuple):
@@ -82,7 +115,6 @@ class LxxWords:
         self.verse = verse 
         self.words_list_tuple = words_parsing_tuple
         self.numb = 0
-
 
 
 def split_mlxx(line):
