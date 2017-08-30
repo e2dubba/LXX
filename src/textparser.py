@@ -40,12 +40,13 @@ def quick_perseus(lemma, packard):
 
 
 class WordParsings:
-    def __init__(self, word_list):
+    def __init__(self, word_list, word_num):
         self.word = word_list[0]
         self.word_un = word_list[1]
         self.parsing = word_list[2]
         self.lexical = word_list[3]
         self.strongs = word_list[4]
+        self.word_num = word_num
 
 
     def deroma_lex(self):
@@ -56,7 +57,8 @@ class WordParsings:
             plaintxt = greek.decode(plaintxt)
         return plaintxt
 
-    def osis_output(self, chap_ele, word_num):
+
+    def osis_output(self, chap_ele):
         word_ele = et.SubElement(chap_ele, 'w')
         if not self.strongs:
             word_ele.attrib['lemma'] = 'Strong:' + self.lexical
@@ -64,7 +66,7 @@ class WordParsings:
             word_ele.attrib['lemma'] = 'Strong:' + self.lexical + \
                     ' lemma.strong:G' + self.strongs
         word_ele.attrib['morph'] = 'packard:' + self.parsing
-        word_ele.attrib['wn'] = '%0.3d'% word_num
+        word_ele.attrib['wn'] = '%0.3d'% self.word_num
         word_ele.text = greek.decode(self.word)
         
 
