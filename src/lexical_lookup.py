@@ -9,6 +9,41 @@ conn = sqlite3.connect('strongs.db')
 c = conn.cursor()
 
 
+def posgen(packard, num):
+    '''
+    This will cycle through the packard.json file with different values for the
+    index in order to help limit the number of valid lexical items. 
+    '''
+    col = 'col.' + str(num)
+    p = num - 1 
+    packing = packard.split()
+    pospeech = packing[0]
+    if pospeech[0] == 'V':
+        packd_speech = packard['Column2']['Verb2'][col][packing[1][p]] 
+        
+    if pospeech[0] == 'N':
+        packd_speech = packard['Column2']['Noun2'][col][packing[1][p]] 
+        
+    if pospeech[0] == 'A': 
+        packd_speech = packard['Column2']['Adj2'][col][packing[1][p]]
+
+    if pospeech[0] == 'C':
+        packd_speech = 'conj'
+    
+    if pospeech[0] == 'D':
+        packd_speech = 'adv'
+    return packd_speech
+
+
+def perseus_dict_sorter(per_dict, packd_speech):
+    '''
+    This needs to take the raw perseus dictionary, scraped from the web, and 
+    then go through each of the lexemes to see if it can be narrowed down to 
+    just one. 
+    see line 52 in check_parse.py
+    '''
+    
+
 
 def check_parse(infl_form, part_of_speech, etymology, packard):
     '''

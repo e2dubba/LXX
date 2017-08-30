@@ -39,9 +39,6 @@ def quick_perseus(lemma, packard):
             PHRASE_JSON[packard] = re.sub(perseus_regex, '', perseus_dict[0])
 
 
-    
-
-
 
 class WordParsings:
     def __init__(self, wordy, word_un, parsing, lexical, strongs, etymology):
